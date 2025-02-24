@@ -28,6 +28,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOCTRE;
 import frc.robot.subsystems.elevator.Ballintake;
+import frc.robot.subsystems.elevator.Ballintake2;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSIM;
@@ -191,8 +192,10 @@ public class RobotContainer {
 
     Command Positionl2 =
         new SequentialCommandGroup(
-            new ParallelDeadlineGroup(
-                new Flippy(elevator1, 0, 0), new Ballintake(algea, -0.8, -25)));
+            new ParallelCommandGroup(
+
+                // setpoint
+                new Ballintake2(algea, 0.8, 5, elevator1, -11.679)));
     Command Positionl3 =
         new SequentialCommandGroup(
             new ParallelDeadlineGroup(
@@ -200,7 +203,7 @@ public class RobotContainer {
 
     Command weirdshootingthing = shoot.cmd(-0.5);
     Command highalgae = new ParallelCommandGroup(new Flippy(elevator1, 0, 0));
-    Command lowalgae = new ParallelCommandGroup(new Flippy(elevator1, 0, 0));
+    Command lowalgae = new ParallelCommandGroup(new Elevatorcmd(elevator1, 1, true));
     // idk what to put for the setpoint as of now we havent tested it yet
 
     // Note that X is defined as forward according to WPILib convention,
@@ -226,10 +229,10 @@ public class RobotContainer {
 
     // joystick  nidwj f
 
-    joystick2.a().onTrue(elevator1.runOnce(() -> elevator1.resetenc()));
-    joystick2.b().whileTrue(elevator1.Motionmagic(5)).whileFalse(elevator1.Motionmagic(0));
+    // joystick2.a().onTrue(elevator1.runOnce(() -> elevator1.resetenc()));
+    // joystick2.b().whileTrue(elevator1.Motionmagic(5)).whileFalse(elevator1.Motionmagic(0));
 
-    joystick2.x().whileTrue(elevator1.cmdf(-25.4033203125)).whileFalse(elevator1.cmdf(0));
+    // joystick2.x().whileTrue(elevator1.cmdf(-25.4033203125)).whileFalse(elevator1.cmdf(0));
 
     // joystick.leftTrigger(0.2).whileTrue(new IntakeWithRumble(shoot, joystick, 0.4));
     joystick.leftTrigger(0.2).whileTrue(shoot.cmd(.4)).whileFalse(shoot.cmd(0));
@@ -283,19 +286,24 @@ public class RobotContainer {
         .leftStick()
         .whileTrue(
             new ConditionalCommand(
-                new Elevatorcmd(elevator1, 3, true),
+                new Elevatorcmd(elevator1, 0, true),
                 Positionl2,
                 () -> Constants.getRobotState() != Constants.RobotState.ALGEA))
-        .whileFalse(new ParallelCommandGroup(new Elevatorcmd(elevator1, 0, false)));
+        .whileFalse(elevator1.Flipydo(0));
+
+    joystick.leftBumper().whileTrue(lowalgae).whileFalse(new Elevatorcmd(elevator1, 0, false));
 
     joystick
         .rightStick()
         .whileTrue(
-            new ConditionalCommand(
-                new Elevatorcmd(elevator1, 2, true),
-                Positionl3,
-                () -> Constants.getRobotState() != Constants.RobotState.ALGEA))
-        .whileFalse(new ParallelCommandGroup(new Elevatorcmd(elevator1, 0, false)));
+            new SequentialCommandGroup(
+                elevator1.Motionmagic2(-17),
+                new ParallelCommandGroup(
+                    new Elevatorcmd(elevator1, 2, true),
+                    new Ballintake2(algea, 0, 0, elevator1, -27.1033203125))))
+        .whileFalse(
+            new SequentialCommandGroup(
+                elevator1.Motionmagictoggle(0), new Elevatorcmd(elevator1, 0, false)));
 
     joystick.start().whileTrue(elevator1.runOnce(() -> elevator1.togglesetpoint()));
 

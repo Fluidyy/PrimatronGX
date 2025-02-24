@@ -11,6 +11,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,8 +24,8 @@ import frc.robot.Constants;
 import java.util.List;
 
 public class elevatorpid extends SubsystemBase {
-  private List<Double> setpoints1 = List.of(0.0, 0.0, 0.0, 9.84423828125, 26.72607421875, 5.0);
-  private List<Double> setpoints2 = List.of(0.0, 17.0, 30.0, 35.0, 4.5, 5.5);
+  private List<Double> setpoints1 = List.of(0.0, 0.0, 0.0, 9.84423828125, 26.841796875, 5.0);
+  private List<Double> setpoints2 = List.of(0.0, 7.75048828125, 7.75048828125, 35.0, 4.5, 5.5);
   private List<Double> activeSetpoints = setpoints1; // Default to setpoints
   private TalonFX le = new TalonFX(14, "Drivetrain");
   private TalonFX re = new TalonFX(13, "Drivetrain");
@@ -108,6 +109,7 @@ public class elevatorpid extends SubsystemBase {
     le.getConfigurator().apply(cfg);
     re.getConfigurator().apply(cfg);
     flippydoo.getConfigurator().apply(cff);
+    flippydoo.setNeutralMode(NeutralModeValue.Brake);
 
     // Follower followrequest = new Follower(le.getDeviceID(), true);
 
@@ -321,6 +323,11 @@ public class elevatorpid extends SubsystemBase {
     return targeposition(index) - 0.3 < sensor;
   }
 
+  public boolean elecheck(int index) {
+    double sensor = le.getPosition().getValueAsDouble();
+    return sensor + 0.1 < targeposition(index);
+  }
+
   public Command Motionmagictoggle(int value) {
     return new Command() {
       // Define a tolerance (adjust as needed based on your sensor units)
@@ -390,14 +397,41 @@ public class elevatorpid extends SubsystemBase {
         double error = Math.abs(le.getPosition().getValueAsDouble() - targetPosition);
         return kTolerance > error;
       }
+    };
+  }
+
+  public Command Motionmagic2(double targetPosition) {
+    return new Command() {
+      // Define a tolerance (adjust as needed based on your sensor units)
+      private final double kTolerance = 0.25;
+
+      @Override
+      public void initialize() {
+        // Optionally reset any state or encoders if needed
+        pidup.setSetpoint(targetPosition);
+      }
+
+      @Override
+      public void execute() {
+
+        // Command the leader motor using Motion Magic with feedforward.
+        // (Since re is meant to follow le, remove direct control of re here.)
+
+        flippydoo.setControl(
+            m_request.withPosition(targetPosition).withFeedForward(0.4).withEnableFOC(true));
+      }
+
+      @Override
+      public boolean isFinished() {
+        // End the command once the error is within tolerance.
+        double position = le.getPosition().getValueAsDouble();
+        return flipcheck(targetPosition);
+      }
 
       @Override
       public void end(boolean interrupted) {
         // Once finished (or interrupted), stop the motors.
-        le.setControl(new VoltageOut(0));
-        // If you’re using a follower, you can let it follow automatically.
-        // Alternatively, if you’re controlling 're' elsewhere, ensure it’s set to zero.
-        re.setControl(new VoltageOut(0));
+
       }
     };
   }

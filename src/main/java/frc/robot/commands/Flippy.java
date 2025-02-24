@@ -24,6 +24,7 @@ public class Flippy extends Command {
   public Flippy(elevatorpid elevator, int targetPosition, double flipyposition) {
     this.elevator = elevator;
     this.targetPosition = targetPosition;
+    this.flipyposition = flipyposition;
     addRequirements(elevator);
   }
 
@@ -51,6 +52,6 @@ public class Flippy extends Command {
   @Override
   public void end(boolean interrupted) {
     // Stop the elevator when the command ends.
-    elevator.stop();
+
   }
 }
