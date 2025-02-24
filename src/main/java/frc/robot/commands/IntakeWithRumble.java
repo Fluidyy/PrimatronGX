@@ -68,7 +68,7 @@ public class IntakeWithRumble extends Command {
     rumbleTimer.stop();
     rumbleTimer.reset();
     // Ensure that we stop both the motor and the rumble when the command ends.
-    shooterSubsystem.speed(-0.1);
+    shooterSubsystem.speed(0.1);
     // If a current spike was detected, trigger the rumble.
     controller.setRumble(RumbleType.kBothRumble, 0);
   }

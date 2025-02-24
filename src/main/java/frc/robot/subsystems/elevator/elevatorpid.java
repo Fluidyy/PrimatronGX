@@ -23,7 +23,7 @@ import frc.robot.Constants;
 import java.util.List;
 
 public class elevatorpid extends SubsystemBase {
-  private List<Double> setpoints1 = List.of(0.0, 5.0, 10.8, 19.7, 32.0, 5.0);
+  private List<Double> setpoints1 = List.of(0.0, 0.0, 0.0, 9.84423828125, 26.72607421875, 5.0);
   private List<Double> setpoints2 = List.of(0.0, 17.0, 30.0, 35.0, 4.5, 5.5);
   private List<Double> activeSetpoints = setpoints1; // Default to setpoints
   private TalonFX le = new TalonFX(14, "Drivetrain");
@@ -90,7 +90,7 @@ public class elevatorpid extends SubsystemBase {
     slot2.kS = 0.25;
     slot2.kV = 0.18; // A velocity target of 1 rps results in 0.12 V output
     slot2.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
-    slot2.kP = 1.5; // A position error of 2.5 rotations results in 12 V output
+    slot2.kP = 1.8; // A position error of 2.5 rotations results in 12 V output
     slot2.kI = 0.1; // no output for integrated error
     slot2.kD = 0; // A velocity error of 1 rps results in 0.1 V output
 
@@ -159,7 +159,7 @@ public class elevatorpid extends SubsystemBase {
 
   public boolean flipcheck(double position) {
     double curentpos = flippydoo.getPosition().getValueAsDouble();
-    if (curentpos - 0.2 < position && curentpos + 0.2 > position) {
+    if (curentpos - 0.5 < position && curentpos + 0.5 > position) {
       return true;
 
     } else {

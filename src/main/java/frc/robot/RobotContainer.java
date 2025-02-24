@@ -18,7 +18,6 @@ import frc.robot.commands.AutonElevatorcmd;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.Elevatorcmd;
 import frc.robot.commands.Flippy;
-import frc.robot.commands.IntakeWithRumble;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIO;
@@ -232,23 +231,48 @@ public class RobotContainer {
 
     joystick2.x().whileTrue(elevator1.cmdf(-25.4033203125)).whileFalse(elevator1.cmdf(0));
 
-    joystick.leftTrigger(0.2).whileTrue(new IntakeWithRumble(shoot, joystick, 0.4));
+    // joystick.leftTrigger(0.2).whileTrue(new IntakeWithRumble(shoot, joystick, 0.4));
+    joystick.leftTrigger(0.2).whileTrue(shoot.cmd(.4)).whileFalse(shoot.cmd(0));
 
-    joystick
-        .rightTrigger(0.2)
-        .whileTrue(
-            new ConditionalCommand(
-                weirdshootingthing,
-                algea.algeacmd(7.302734375, 0.6),
-                () -> Constants.getRobotState() != Constants.RobotState.ALGEA))
-        .whileFalse(new ParallelCommandGroup(algea.algeacmd(0, 0), shoot.cmd(0)));
+    joystick.rightTrigger(0.2).whileTrue(shoot.cmd(-.2)).whileFalse(shoot.cmd(0));
+    // joystick
+    //     .rightTrigger(0.2)
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             weirdshootingthing,
+    //             algea.algeacmd(7.302734375, 0.6),
+    //             () -> Constants.getRobotState() != Constants.RobotState.ALGEA))
+    //     .whileFalse(new ParallelCommandGroup(algea.algeacmd(0, 0), shoot.cmd(0)));
 
     joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.resetgyro()));
 
     joystick
         .a()
         .whileTrue(new Elevatorcmd(elevator1, 1, true))
-        .whileFalse(new Elevatorcmd(elevator1, 0, false));
+        .whileFalse(
+            new SequentialCommandGroup(
+                elevator1.Motionmagictoggle(0), new Elevatorcmd(elevator1, 0, false)));
+
+    joystick
+        .b()
+        .whileTrue(new Elevatorcmd(elevator1, 2, true))
+        .whileFalse(
+            new SequentialCommandGroup(
+                elevator1.Motionmagictoggle(0), new Elevatorcmd(elevator1, 0, false)));
+
+    joystick
+        .y()
+        .whileTrue(new Elevatorcmd(elevator1, 3, true))
+        .whileFalse(
+            new SequentialCommandGroup(
+                elevator1.Motionmagictoggle(0), new Elevatorcmd(elevator1, 0, false)));
+
+    joystick
+        .rightBumper()
+        .whileTrue(new Elevatorcmd(elevator1, 4, true))
+        .whileFalse(
+            new SequentialCommandGroup(
+                elevator1.Motionmagictoggle(0), new Elevatorcmd(elevator1, 0, false)));
 
     joystick
         .back()

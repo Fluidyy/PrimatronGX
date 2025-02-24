@@ -9,10 +9,10 @@ public class Elevatorcmd extends Command {
   private final int targetPosition;
   private final double tolerance = 0.25; // Tolerance to switch from Motion Magic to PID
   private double l0 = 0;
-  private double l1 = -25.4033203125;
-  private double l2 = 1;
-  private double l3 = 1;
-  private double l4 = 1;
+  private double l1 = -4.13134765625;
+  private double l2 = -27.1033203125;
+  private double l3 = -27.1033203125;
+  private double l4 = -22.03759765625;
   private boolean first;
   private boolean up;
 
@@ -116,6 +116,6 @@ public class Elevatorcmd extends Command {
   @Override
   public void end(boolean interrupted) {
     // Stop the elevator when the command ends.
-    elevator.stop();
+
   }
 }
