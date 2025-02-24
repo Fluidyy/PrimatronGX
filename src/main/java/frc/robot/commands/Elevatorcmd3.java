@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.elevator.elevatorpid;
 
-public class Elevatorcmd extends Command {
+public class Elevatorcmd3 extends Command {
   private final elevatorpid elevator;
   private final int targetPosition;
   private final double tolerance = 0.25; // Tolerance to switch from Motion Magic to PID
@@ -33,7 +33,7 @@ public class Elevatorcmd extends Command {
    * @param elevator The elevator subsystem.
    * @param targetPosition The target position (in sensor units) to move to.
    */
-  public Elevatorcmd(elevatorpid elevator, int targetPosition, boolean hi) {
+  public Elevatorcmd3(elevatorpid elevator, int targetPosition, boolean hi) {
     this.up = hi;
     this.elevator = elevator;
     this.targetPosition = targetPosition;
@@ -43,19 +43,7 @@ public class Elevatorcmd extends Command {
   @Override
   public void initialize() {
 
-    if (targetPosition == 1) {
-      Constants.setElevatorState(Constants.Elevatorposition.L1);
-    } else if (targetPosition == 2) {
-      Constants.setElevatorState(Constants.Elevatorposition.L2);
-    } else if (targetPosition == 3) {
-      Constants.setElevatorState(Constants.Elevatorposition.L3);
-    } else if (targetPosition == 4) {
-      Constants.setElevatorState(Constants.Elevatorposition.L4);
-
-      // Normal
-    } else {
-      Constants.setElevatorState(Constants.Elevatorposition.L0);
-    }
+    
     // Start in the MOVING state and reset encoders if needed.
     currentState = State.MOVING;
     if (elevator.getLeftPosition() < 0.1) {
@@ -70,18 +58,7 @@ public class Elevatorcmd extends Command {
 
     if (up) {
       // Set flipsetpoint based on the desired elevator state.
-      if (Constants.getElevatorState() == Constants.Elevatorposition.L1) {
-        flipsetpoint = l1;
-      } else if (Constants.getElevatorState() == Constants.Elevatorposition.L2) {
-        flipsetpoint = l2;
-      } else if (Constants.getElevatorState() == Constants.Elevatorposition.L3) {
-        flipsetpoint = l3;
-      } else if (Constants.getElevatorState() == Constants.Elevatorposition.L4) {
-        flipsetpoint = l4;
-
-        // BargeShoot
-
-      }
+     
 
       // Check if the flip motor has reached its setpoint.
       // Note: Use flipsetpoint (not targetPosition) for the check.
